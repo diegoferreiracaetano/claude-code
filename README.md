@@ -128,29 +128,29 @@ This repository holds the four course systems for the **Harness Engineering** ca
 | 1 | System 1 test suite passing | ✅ 29 passed | `evidence/system-1-claims-intake/pytest_output.txt` |
 | 2 | System 1 run artifact, each claim → routed or escalated | ⚠️ Partial: 6/8 (see honest limitation above) | `evidence/system-1-claims-intake/run_sonnet_20260917_112347/{summary.md,queues/,escalations.jsonl}` |
 | 3 | ≥1 trace shows per-turn `stop_reason`, continue on `tool_use`, stop on `end_turn` | ✅ | `.../traces/claim_05_auto_collision.jsonl` (quoted above) |
-| 4 | Brief identifies file/function for loop termination + names an anti-pattern | 🔲 Pending (brief not yet written) | — |
+| 4 | Brief identifies file/function for loop termination + names an anti-pattern | ✅ | brief Q1–Q2 |
 | 5 | System 4 test suite passing | ✅ 33 passed | `evidence/system-4-shift-monitor/pytest_output.txt` |
 | 6 | System 4 run artifact uses SQL-filtered slice, not full history | ✅ 7/13 (shift C), 7/40 (all shifts) | `evidence/system-4-shift-monitor/shift_run_output.txt` |
 | 7 | `hot_state.json` under ~5 KB | ✅ 775 bytes | `evidence/system-4-shift-monitor/hot_state.json` |
-| 8 | Brief explains resume-vs-fresh + staleness threshold + fork isolation | 🔲 Pending | — |
+| 8 | Brief explains resume-vs-fresh + staleness threshold + fork isolation | ✅ | brief Q12 |
 | 9 | System 2 test suite passing | ✅ 30/30 passed | `evidence/system-2-retail-context/pytest_output.txt` |
 | 10 | `budget.json` ≥50% reduction | ✅ 56.31% | `evidence/system-2-retail-context/run_20260917-112911/budget.json` |
 | 11 | Eval ≥5/6 | ✅ 6/6 | `.../run_20260917-112911/eval.jsonl` |
 | 12 | Control regresses on ≥1 question | ✅ Q6 fails | `.../run_20260917-112911/eval_control.jsonl` |
-| 13 | Brief explains summarize-vs-preserve-verbatim, citing token numbers | 🔲 Pending | — |
+| 13 | Brief explains summarize-vs-preserve-verbatim, citing token numbers | ✅ | brief Q6 |
 | 14 | Validator prints `OK`, exit 0 | ✅ | `evidence/system-3-claude-code-config/validator_output.txt` |
 | 15 | System 3 test suite passing | ✅ 35 passed | `evidence/system-3-claude-code-config/pytest_output.txt` |
 | 16 | `CLAUDE.md` uses `@import` | ✅ 4 imports | `.../solution/CLAUDE.md` |
 | 17 | Path-scoped rule w/ glob frontmatter, project command, forked read-only skill | ✅ all 3 confirmed | `.claude/rules/react.md`, `.claude/commands/review.md`, `.claude/skills/deploy-check/SKILL.md` |
-| 18 | Brief explains path-scoped rule vs. directory CLAUDE.md, and why the skill forks | 🔲 Pending | — |
+| 18 | Brief explains path-scoped rule vs. directory CLAUDE.md, and why the skill forks | ✅ | brief Q8–Q9 |
 | 19 | Passing pytest output for all 4 systems, each identifiable to its system | ✅ | one `pytest_output.txt` per `evidence/system-*/` folder |
-| 20 | Brief names a test-suite guarantee manual inspection wouldn't reveal | 🔲 Pending | — |
-| 21 | Every brief answer cites a concrete artifact | 🔲 Pending | — |
-| 22 | Synthesis locates the 3 layers (Model/Harness/Orchestration) in a named file | 🔲 Pending | — |
-| 23 | Brief contrasts deterministic enforcement vs. prompt-based guidance, one example each | 🔲 Pending | — |
-| 24 | Brief compares context management: System 2 (intra-session) vs. System 4 (cross-session), with numbers from both | 🔲 Pending | — |
+| 20 | Brief names a test-suite guarantee manual inspection wouldn't reveal | ✅ | brief Q17 (`test_hotstate_atomic_write`) |
+| 21 | Every brief answer cites a concrete artifact | ✅ | every Q1–Q20 cites a file path, run ID, token count, or test name |
+| 22 | Synthesis locates the 3 layers (Model/Harness/Orchestration) in a named file | ✅ | brief Q14 |
+| 23 | Brief contrasts deterministic enforcement vs. prompt-based guidance, one example each | ✅ | brief Q15 |
+| 24 | Brief compares context management: System 2 (intra-session) vs. System 4 (cross-session), with numbers from both | ✅ | brief Q16 |
 
-**Next step:** fill in `Project-Harness Engineering with Claude and Claude Code /reflection-brief-template.md` (rows 4, 8, 13, 18, 20–24 above) — everything it needs to cite is already captured in `evidence/`.
+**Status: all 24 criteria complete.** The reflection brief is filled in at `Project-Harness Engineering with Claude and Claude Code /reflection-brief-template.md`, and `capstone-submission.zip` (repo root) packages the evidence folders and the brief together per the submission instructions.
 
 ---
 

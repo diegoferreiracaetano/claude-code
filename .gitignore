@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+*.egg-info/
+runs/
+Build a Multi-Shift Quality Monitoring System with Claude Orchestration/04-fork-scratchpad/solution/data/

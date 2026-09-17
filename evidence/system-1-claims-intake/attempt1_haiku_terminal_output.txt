@@ -1,0 +1,19 @@
+run_dir: /Users/diego/Documents/Projects/claude-code/Build a Claims Intake Agent with a stop_reason-Driven Loop/exercises/03-dynamic-decomposition/solution/runs/20260917_111926
+[claim_01_kitchen_fire] policy=POL-1001 expected=routed
+  → outcome=incomplete turns=2 clarifications=0 tokens=6257/418 est=$0.0083
+[claim_02_stolen_bike] policy=POL-1007 expected=routed
+  → outcome=incomplete turns=2 clarifications=0 tokens=6155/440 est=$0.0084
+[claim_03_water_damage] policy=POL-1004 expected=routed
+  → outcome=incomplete turns=2 clarifications=0 tokens=6210/476 est=$0.0086
+[claim_04_neighbor_injury] policy=POL-1002 expected=routed
+  → outcome=routed turns=5 clarifications=0 tokens=17734/922 est=$0.0223
+[claim_05_auto_collision] policy=POL-1003 expected=routed
+  → outcome=routed turns=4 clarifications=0 tokens=14912/944 est=$0.0196
+[claim_06_low_confidence_escalation] policy=POL-1008 expected=escalated
+  → outcome=incomplete turns=2 clarifications=0 tokens=6395/511 est=$0.0089
+[claim_07_tree_falls_on_car] policy=POL-1005 expected=routed
+  → outcome=incomplete turns=2 clarifications=0 tokens=6306/515 est=$0.0089
+[claim_08_minor_porch_damage] policy=POL-1006 expected=routed
+  → outcome=routed turns=4 clarifications=0 tokens=14687/865 est=$0.0190
+summary: /Users/diego/Documents/Projects/claude-code/Build a Claims Intake Agent with a stop_reason-Driven Loop/exercises/03-dynamic-decomposition/solution/runs/20260917_111926/summary.md
+total estimated cost: $0.1041

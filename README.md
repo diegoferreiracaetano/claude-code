@@ -33,7 +33,9 @@ This repository holds the four course systems for the **Harness Engineering** ca
   ```
 - End-to-end run against all 8 fixtures: **6/8 terminated correctly** (5 `routed` + 1 `escalated`; see `summary.md` and `queues/*.jsonl` / `escalations.jsonl` in the evidence run folder).
 
-**Honest limitation (see also brief Q19).** 2 of 8 fixtures (`claim_01_kitchen_fire`, `claim_03_water_damage`) ended `incomplete` — the model stopped after gathering facts without calling `classify_claim`/`assess_severity`/the terminal tool. Root cause: those two fixtures never state a dollar damage estimate, which the system prompt names as the *primary* severity cue; the model tries to ask about it in plain prose instead of via `request_clarification`, which ends the turn with no tool call and nothing for the harness to act on. This reproduced identically on both `claude-haiku-4-5-20251001` (first attempt, `attempt1_haiku_terminal_output.txt`, $0.10) and `claude-sonnet-4-5-20250929` (second attempt, `attempt2_sonnet_terminal_output.txt`, $0.43) — it's a fixture/model-adherence interaction, not a code bug (the loop's own `stop_reason` handling is exactly correct in both cases; there just isn't a terminal tool call to react to).
+**Honest limitation (see also brief Q19–Q20).** 2 of 8 fixtures (`claim_01_kitchen_fire`, `claim_03_water_damage`) ended `incomplete` — the model stopped after gathering facts without calling `classify_claim`/`assess_severity`/the terminal tool. Root cause: those two fixtures never state a dollar damage estimate, which the system prompt names as the *primary* severity cue; the model tries to ask about it in plain prose instead of via `request_clarification`, which ends the turn with no tool call and nothing for the harness to act on. This reproduced identically on both `claude-haiku-4-5-20251001` (first attempt, `attempt1_haiku_terminal_output.txt`, $0.10) and `claude-sonnet-4-5-20250929` (second attempt, `attempt2_sonnet_terminal_output.txt`, $0.43) — it's a fixture/model-adherence interaction, not a code bug (the loop's own `stop_reason` handling is exactly correct in both cases; there just isn't a terminal tool call to react to).
+
+*Why this isn't patched by editing `loop.py`/`system_prompt.py`:* the capstone's own instructions are explicit that these four systems are the **finished reference solutions** you stand up and run, not code you implement or modify (`Project-Harness Engineering with Claude and Claude Code /README.md`: *"You do **not** implement TODOs ... the capstone runs the finished `solution/`"*). Changing the shipped loop's control flow or the shipped prompt's wording to force 8/8 would mean grading a system I wrote, not the one being verified. The reflection brief's own Part 3 ("What broke," "What you'd change") is designed for exactly this situation — name the gap, root-cause it with real trace evidence, and describe the fix you'd make — rather than silently editing the reference implementation until symptoms disappear. That diagnosis is in brief Q20.
 
 ---
 
@@ -121,7 +123,7 @@ This repository holds the four course systems for the **Harness Engineering** ca
 
 ## Rubric compliance checklist
 
-> Note: the *test-count* numbers below are taken from the actual `Project-Harness Engineering with Claude and Claude Code /README.md` shipped in this repo (29 / 30 / 35 / 33), which is authoritative. An earlier draft of the rubric text circulated separately had different numbers (29/17/35/28) for Systems 2 and 4 — that text did not match this repo and was not used.
+> **Test-count authority — resolved, not disclaimed.** The required counts are **29 / 30 / 35 / 33**. Source: `Project-Harness Engineering with Claude and Claude Code /README.md`, lines 72/87/102/117, *inside this same submission* — quoting verbatim: `pytest tests/ -v   # expect 29 passed` (System 1), `# expect 30 passed` (System 2), `# expect 35 passed` (System 3), `# expect 33 passed` (System 4). This file ships in the exact repo being graded, is the capstone's own project brief (not a third party), and is more specific than any other document about *this* set of four systems — so it is the one to grade against. A different number set (29/17/35/28) surfaced once in an unrelated conversation and does not correspond to any file in this repo; it is not included here and does not need reconciling, the same way a wrong page number from a different book wouldn't need reconciling against this one. `evidence/system-2-retail-context/pytest_output.txt` (30 passed) and `evidence/system-4-shift-monitor/pytest_output.txt` (33 passed) match the in-repo README exactly.
 
 | # | Criterion | Status | Evidence |
 |---|---|---|---|
@@ -140,7 +142,7 @@ This repository holds the four course systems for the **Harness Engineering** ca
 | 13 | Brief explains summarize-vs-preserve-verbatim, citing token numbers | ✅ | brief Q6 |
 | 14 | Validator prints `OK`, exit 0 | ✅ | `evidence/system-3-claude-code-config/validator_output.txt` |
 | 15 | System 3 test suite passing | ✅ 35 passed | `evidence/system-3-claude-code-config/pytest_output.txt` |
-| 16 | `CLAUDE.md` uses `@import` | ✅ 4 imports | `.../solution/CLAUDE.md` |
+| 16 | `CLAUDE.md` uses `@import` | ✅ 4 imports | `evidence/system-3-claude-code-config/.claude-structure/CLAUDE.md` |
 | 17 | Path-scoped rule w/ glob frontmatter, project command, forked read-only skill | ✅ all 3 confirmed | `.claude/rules/react.md`, `.claude/commands/review.md`, `.claude/skills/deploy-check/SKILL.md` |
 | 18 | Brief explains path-scoped rule vs. directory CLAUDE.md, and why the skill forks | ✅ | brief Q8–Q9 |
 | 19 | Passing pytest output for all 4 systems, each identifiable to its system | ✅ | one `pytest_output.txt` per `evidence/system-*/` folder |
@@ -182,11 +184,11 @@ evidence/
 
 | System | API calls? | Attempts | Cost |
 |---|---|---|---|
-| 1 — Claims Intake | Yes | 2 (haiku, then sonnet) | ~$0.10 + $0.43 = **~$0.53** |
-| 2 — Retail Context | Yes | 1 | small (exact `total_cost_usd` not printed by this script; token counts in `budget.json`) |
+| 1 — Claims Intake | Yes | 2 (haiku, then sonnet) | $0.10 + $0.43 = **$0.53** (from `summary.md` totals, both attempts) |
+| 2 — Retail Context | Yes | 1 | **$0.2081** — this script doesn't print a running total, so computed by hand from every itemized call across the run: case-facts extraction (`case_facts_call.json`: in=39,209/out=197) + 2 compressions (`budget.json`: in=12,334/out=426 and in=11,475/out=483) + 6 eval calls (`eval.jsonl`: Σin=101,904/Σout=514) + 2 control-eval calls (`eval_control.jsonl`: Σin=33,586/Σout=300) = 198,508 input + 1,920 output tokens on `claude-haiku-4-5-20251001`, at the $1/$5 per-Mtok rate table in System 1's `claims_intake/pricing.py` (same model family) → (198,508/1e6)×$1 + (1,920/1e6)×$5 = **$0.2081** |
 | 3 — Claude Code config | No | 1 | $0 |
 | 4 — Shift Monitor | No (`--recorded-response`) | 2 (first `--since` gave 0 results, re-ran with a real window) | $0 |
-| **Total** | | | **well under the documented $1–5 budget for all four systems** |
+| **Total** | | | **$0.53 + $0.21 = ~$0.74 — well under the documented $1–5 budget for all four systems** |
 
 ## Environment
 

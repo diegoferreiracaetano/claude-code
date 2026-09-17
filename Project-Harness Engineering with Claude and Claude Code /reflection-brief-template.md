@@ -9,7 +9,7 @@ Replace each `→` with your answer. **Every answer cites at least one artifact 
 
 - Model(s): `claude-haiku-4-5-20251001` (System 1 first attempt, System 2), `claude-sonnet-4-5-20250929` (System 1 accepted run)
 - OS / Python: macOS (Darwin), Python 3.14.6
-- Approx. API spend: ~$0.53 for System 1 (two attempts: $0.10 Haiku + $0.43 Sonnet, from `summary.md` totals) + a small additional amount for System 2 (exact total not printed by the script; `budget.json` shows ~24k input / ~0.9k output tokens for the two compression calls alone, plus the case-facts extraction and 6 eval calls). Systems 3 and 4 cost $0 (System 3 makes no API calls; System 4 ran with `--recorded-response`).
+- Approx. API spend: **$0.74 total** — $0.53 for System 1 (two attempts: $0.10 Haiku + $0.43 Sonnet, from `summary.md` totals) + $0.2081 for System 2 (computed by hand from every itemized call's token counts across the run — `case_facts_call.json`, `budget.json`, `eval.jsonl`, `eval_control.jsonl` — at System 1's `pricing.py` Haiku rate table; see README Cost log for the full breakdown). Systems 3 and 4 cost $0 (System 3 makes no API calls; System 4 ran with `--recorded-response`).
 
 ---
 

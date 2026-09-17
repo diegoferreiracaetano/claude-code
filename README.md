@@ -96,7 +96,7 @@ This repository holds the four course systems for the **Harness Engineering** ca
 **Verified.**
 - `python -m ecommerce_team_config .` → **`OK`**, exit **0** (`evidence/system-3-claude-code-config/validator_output.txt`).
 - `pytest tests/ -v` → **35 passed** (`evidence/system-3-claude-code-config/pytest_output.txt`).
-- Full `.claude/` tree copied to `evidence/system-3-claude-code-config/.claude-structure/`.
+- `CLAUDE.md` + the full `.claude/` tree copied to `evidence/system-3-claude-code-config/.claude-structure/`.
 
 ---
 
@@ -114,7 +114,7 @@ This repository holds the four course systems for the **Harness Engineering** ca
 
 **Verified.**
 - `pytest tests/ -v` → **33 passed** (`evidence/system-4-shift-monitor/pytest_output.txt`).
-- Warm tier seeded with the full fixture set (40 defects, 13 for shift C). Ran with `--since 2026-04-16T00:00:00Z` (the tool's own default, "8h ago", returns 0 against this static historical fixture set — expected, since "now" is 2026-09-17 in this environment): **7 of 13** shift-C defects returned — a real SQL-filtered slice, not the full history (`evidence/system-4-shift-monitor/shift_run_output.txt`).
+- Warm tier seeded with the full fixture set (40 defects). Ran with `--since 2026-04-16T00:00:00Z` (the tool's own default, "8h ago", returns 0 against this static historical fixture set — expected, since "now" is 2026-09-17 in this environment): **7 of 40** defects returned — a real SQL-filtered slice, not the full history (`evidence/system-4-shift-monitor/shift_run_output.txt`, `new=7`). Correction after a closer read of `warm.py`: `defects_since(since_ts, limit)` is `WHERE ts > ? ORDER BY ts DESC LIMIT ?` — it filters by **timestamp only**, not by shift; `--shift C` is used solely to label the invocation (`ShiftResult.shift_id`, the prompt's `role`, the summary text), never to scope the SQL. Querying the actual `warm.sqlite` for this run's 7 rows confirms they span shifts A, B, *and* C (2/2/3) — not 7 of the 13 shift-C-only defects as an earlier draft of this README incorrectly stated. The push-work-down property still holds (7 of 40, not all 40), just not scoped the way "per-shift" naming might suggest.
 - `data/hot_state.json`: **775 bytes** (budget: ~5 KB) — `evidence/system-4-shift-monitor/hot_state.json`.
 - One line appended to `data/shift_scratchpad.jsonl` — `evidence/system-4-shift-monitor/shift_scratchpad.jsonl`.
 - Ran fully offline via `--recorded-response`: **$0 spend** on this system.
@@ -132,7 +132,7 @@ This repository holds the four course systems for the **Harness Engineering** ca
 | 3 | ≥1 trace shows per-turn `stop_reason`, continue on `tool_use`, stop on `end_turn` | ✅ | `.../traces/claim_05_auto_collision.jsonl` (quoted above) |
 | 4 | Brief identifies file/function for loop termination + names an anti-pattern | ✅ | brief Q1–Q2 |
 | 5 | System 4 test suite passing | ✅ 33 passed | `evidence/system-4-shift-monitor/pytest_output.txt` |
-| 6 | System 4 run artifact uses SQL-filtered slice, not full history | ✅ 7/13 (shift C), 7/40 (all shifts) | `evidence/system-4-shift-monitor/shift_run_output.txt` |
+| 6 | System 4 run artifact uses SQL-filtered slice, not full history | ✅ 7/40, timestamp-filtered (not shift-filtered — see System 4 section) | `evidence/system-4-shift-monitor/shift_run_output.txt` |
 | 7 | `hot_state.json` under ~5 KB | ✅ 775 bytes | `evidence/system-4-shift-monitor/hot_state.json` |
 | 8 | Brief explains resume-vs-fresh + staleness threshold + fork isolation | ✅ | brief Q12 |
 | 9 | System 2 test suite passing | ✅ 30/30 passed | `evidence/system-2-retail-context/pytest_output.txt` |
@@ -172,7 +172,9 @@ evidence/
 ├── system-3-claude-code-config/
 │   ├── pytest_output.txt                       35 passed
 │   ├── validator_output.txt                    "OK", exit 0
-│   └── .claude-structure/.claude/              full copy of the validated config tree
+│   └── .claude-structure/
+│       ├── CLAUDE.md                           the 4 @-imports live here
+│       └── .claude/                            full copy of the validated config tree
 └── system-4-shift-monitor/
     ├── pytest_output.txt                       33 passed
     ├── shift_run_output.txt
@@ -184,14 +186,20 @@ evidence/
 
 | System | API calls? | Attempts | Cost |
 |---|---|---|---|
-| 1 — Claims Intake | Yes | 2 (haiku, then sonnet) | $0.10 + $0.43 = **$0.53** (from `summary.md` totals, both attempts) |
+| 1 — Claims Intake | Yes | 2 (haiku, then sonnet) | $0.1041 + $0.4332 = **$0.5373** (from `summary.md` totals, both attempts) |
 | 2 — Retail Context | Yes | 1 | **$0.2081** — this script doesn't print a running total, so computed by hand from every itemized call across the run: case-facts extraction (`case_facts_call.json`: in=39,209/out=197) + 2 compressions (`budget.json`: in=12,334/out=426 and in=11,475/out=483) + 6 eval calls (`eval.jsonl`: Σin=101,904/Σout=514) + 2 control-eval calls (`eval_control.jsonl`: Σin=33,586/Σout=300) = 198,508 input + 1,920 output tokens on `claude-haiku-4-5-20251001`, at the $1/$5 per-Mtok rate table in System 1's `claims_intake/pricing.py` (same model family) → (198,508/1e6)×$1 + (1,920/1e6)×$5 = **$0.2081** |
 | 3 — Claude Code config | No | 1 | $0 |
 | 4 — Shift Monitor | No (`--recorded-response`) | 2 (first `--since` gave 0 results, re-ran with a real window) | $0 |
-| **Total** | | | **$0.53 + $0.21 = ~$0.74 — well under the documented $1–5 budget for all four systems** |
+| **Total** | | | **$0.5373 + $0.2081 = $0.7454 (~$0.75) — well under the documented $1–5 budget for all four systems** |
 
 ## Environment
 
 - Python 3.14.6 (repo requires 3.11+); separate `.venv` per system (already `.gitignore`d).
-- `anthropic==0.39.0` pinned by System 1 required pinning `httpx<0.28` (newer httpx dropped the `proxies` kwarg System 1's SDK version still passes) — see `evidence/system-1-claims-intake/attempt1_haiku_terminal_output.txt` for the original traceback. System 2 (`anthropic==0.69.0`) needed no such fix.
+- `anthropic==0.39.0` pinned by System 1 required pinning `httpx<0.28` (newer httpx dropped the `proxies` kwarg System 1's SDK version still passes). The original crash, before the fix:
+  ```
+  File ".../anthropic/_base_client.py", line 754, in __init__
+      super().__init__(**kwargs)
+  TypeError: Client.__init__() got an unexpected keyword argument 'proxies'
+  ```
+  This traceback isn't saved as a standalone file in `evidence/` — the very first `--all` attempt crashed before producing any output file, so `attempt1_haiku_terminal_output.txt` only captures the *retry* after `pip install "httpx<0.28"` fixed it (that file's own first line, `run_dir: .../runs/20260917_111926`, is already past the fix). System 2 (`anthropic==0.69.0`) needed no such fix.
 - Auth: Vocareum `ANTHROPIC_API_KEY` (`voc-...`) + `ANTHROPIC_BASE_URL=https://claude.vocareum.com`.
